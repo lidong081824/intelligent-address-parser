@@ -121,11 +121,11 @@ class ParseAddress {
   }
 
   /**
- * 提取姓名
- * @param result
- * @param maxLen 字符串占位 比这个数值短才识别为姓名 汉字2位英文1位
- * @param firstName 最初切分地址识别到的name
- */
+   * 提取姓名
+   * @param result
+   * @param maxLen 字符串占位 比这个数值短才识别为姓名 汉字2位英文1位
+   * @param firstName 最初切分地址识别到的name
+   */
   static parseName (result, { maxLen = 11, firstName } = {}) {
     if (!result.name || Utils.strLen(result.name) > 15) {
       const list = result.details.split(' ');
@@ -134,29 +134,14 @@ class ParseAddress {
         index: -1
       };
       if (list.length > 1) {
-        let shortestLength = Infinity;
-        let lastIndex = -1;
         let index = 0;
         for (const v of list) {
-          const strLen = Utils.strLen(v);
-          if (v && strLen <= maxLen && strLen <= shortestLength) {
-            if (strLen < shortestLength) {
-              shortestLength = strLen;
-              lastIndex = index;
-            } else if (strLen === shortestLength) {
-              lastIndex = index; // 更新为当前索引，确保取最后一个
-            }
-            if (firstName && v === firstName) {
-              name.value = v;
-              name.index = index;
-              break;
-            }
+          if (v && !name.value || v && Utils.strLen(name.value) > Utils.strLen(v) || firstName && v === firstName) {
+            name.value = v;
+            name.index = index;
+            if (firstName && v === firstName) break;
           }
           index += 1;
-        }
-        if (lastIndex !== -1) {
-          name.value = list[lastIndex];
-          name.index = lastIndex;
         }
       }
       if (name.value) {
